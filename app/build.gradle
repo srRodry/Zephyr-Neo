@@ -96,24 +96,21 @@ android {
 
     sourceSets {
         main {
-            java {
-                srcDirs += 'src/main/java'
-            }
-            kotlin {
-                srcDirs += 'src/main/java'
-            }
+            manifest.srcFile 'main/AndroidManifest.xml'
+            java.srcDirs = ['main/java', 'main/sdl-java']
+            kotlin.srcDirs = ['main/java']
+            res.srcDirs = ['main/res']
+            assets.srcDirs = ['main/assets']
         }
-        
-        main {
-            resources {
-                srcDirs("src/main/generated/baselineProfiles")
-            }
+
+        debug {
+            jniLibs.srcDir 'main/jniLibs-debug'
         }
     }
 
     externalNativeBuild {
         cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
+            path = file("main/cpp/CMakeLists.txt")
             version = "3.25.1"
         }
     }
@@ -148,18 +145,4 @@ kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
     }
-}
-
-task ensureTempDir {
-    doLast {
-        def tempDir = new File("/data/data/com.tom.rv2ide/files/usr/tmp")
-        if (!tempDir.exists()) {
-            tempDir.mkdirs()
-            println "Created temp directory: ${tempDir.absolutePath}"
-        }
-    }
-}
-
-tasks.matching { it.name.startsWith('assemble') || it.name.startsWith('compile') }.all {
-    dependsOn ensureTempDir
 }

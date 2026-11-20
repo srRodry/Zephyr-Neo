@@ -6,7 +6,7 @@ Zephyr-Neo é um projeto de emulação de Xbox original para Android, derivado d
 
 - **Xbox original:** núcleo xemu e código dos renderizadores em [app/main/cpp/hw/xbox/nv2a/pgraph](app/main/cpp/hw/xbox/nv2a/pgraph).
 - **Xbox 360:** o núcleo Xenia Edge mencionado no histórico do Xenra não está presente neste checkout. A árvore atual só permite investigar a renderização do Xbox original.
-- **Build Android:** o [Gradle](app/build.gradle) aponta para `app/src/main/cpp/CMakeLists.txt`. Os fontes estão em `app/main/`, e o arquivo de entrada do CMake também está ausente desse diretório. O [CMakeLists.txt na raiz](CMakeLists.txt) é um esboço sem alvos de compilação.
+- **Build Android:** o [Gradle](app/build.gradle) usa os fontes em `app/main/`. A compilação nativa ainda depende da recuperação de `app/main/cpp/CMakeLists.txt` e dos arquivos de build das dependências vendorizadas. O [CMakeLists.txt na raiz](CMakeLists.txt) é um esboço sem alvos de compilação.
 
 ## History & Origins
 

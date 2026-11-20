@@ -20,13 +20,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "Xanite"
 include(":app")
-
-def tempDirPath = "/data/data/com.tom.rv2ide/files/usr/tmp"
-def tempDir = file(tempDirPath)
-if (!tempDir.exists()) {
-    tempDir.mkdirs()
-    println "Created temp directory: ${tempDir.absolutePath}"
-}
-
-System.setProperty("java.io.tmpdir", tempDirPath)
-println "Java temp directory set to: ${System.getProperty('java.io.tmpdir')}"
