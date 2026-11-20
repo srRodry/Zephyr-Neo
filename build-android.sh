@@ -36,11 +36,13 @@ cmake -S "$mobile/emulator-core/src/main/cpp" -B "$mobile_build" -G Ninja \
 cmake --build "$mobile_build" --target emu hardware_ProcessorInfo main_hook \
   file_redirect_hook gsl_alloc_hook hook_impl
 
+ndk_strip="$(sed -n 's/^CMAKE_STRIP:FILEPATH=//p' "$mobile_build/CMakeCache.txt")"
 mkdir -p "$mobile_jni"
-cp -- "$mobile_build/libe.so" "$mobile_build/libhardware_ProcessorInfo.so" "$mobile_jni/"
 hook_dir="$mobile_build/xenia/third_party/libadrenotools/src/hook"
-for hook in main_hook file_redirect_hook gsl_alloc_hook hook_impl; do
-  cp -- "$hook_dir/libneo360_$hook.so" "$mobile_jni/"
+for library in "$mobile_build/libe.so" "$mobile_build/libhardware_ProcessorInfo.so" \
+  "$hook_dir/libneo360_main_hook.so" "$hook_dir/libneo360_file_redirect_hook.so" \
+  "$hook_dir/libneo360_gsl_alloc_hook.so" "$hook_dir/libneo360_hook_impl.so"; do
+  "$ndk_strip" --strip-unneeded -o "$mobile_jni/${library##*/}" "$library"
 done
 
 exec "$engine/android/gradlew" -p "$root/integration" :app:assembleDebug
