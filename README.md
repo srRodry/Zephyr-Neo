@@ -14,7 +14,7 @@ cd ../..
 ANDROID_NDK=/caminho/do/ndk NC_DEPS=/caminho/das/dependencias ./build-android.sh
 ```
 
-As revisões das dependências e o ambiente Android estão no [guia de compilação do Zephyr-x](https://github.com/srRodry/Zephyr-x/blob/a7cdb5a975e31730d488c47f6f10440b16c1e6f4/android/README.md). O script usa o app de depuração da base, com o identificador `com.rfandango.haku_x.debug`. A integração do módulo de Xbox 360 do Zephyr-Mobile fica pendente.
+As revisões das dependências e o ambiente Android estão no [guia de compilação do Zephyr-x](https://github.com/srRodry/Zephyr-x/blob/a7cdb5a975e31730d488c47f6f10440b16c1e6f4/android/README.md). Use a revisão `26be815b` do libslirp. Ela define o tipo `slirp_ssize_t` exigido pelo Zephyr-x, enquanto a tag `v4.7.0` usa `ssize_t`. O script usa o app de depuração da base, com o identificador `com.rfandango.haku_x.debug`. A integração do módulo de Xbox 360 do Zephyr-Mobile fica pendente.
 
 ## Árvore herdada do Xenra
 
