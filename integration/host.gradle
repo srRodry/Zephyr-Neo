@@ -8,8 +8,8 @@ plugins.withId('com.android.application') {
         finalizeDsl { dsl ->
             dsl.defaultConfig.applicationId = providers.gradleProperty('neoPreviewApplicationId').getOrElse('com.pixelcode.zephyrneo')
             dsl.defaultConfig.minSdk = 29
-            dsl.defaultConfig.versionName = '0.1.1'
-            dsl.defaultConfig.versionCode = 2
+            dsl.defaultConfig.versionName = '0.1.2'
+            dsl.defaultConfig.versionCode = 3
             dsl.buildTypes.debug.minifyEnabled = false
         }
         beforeVariants(selector().withBuildType('release')) { variant ->
@@ -36,6 +36,7 @@ plugins.withId('com.android.application') {
     }
     tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn(verifyNativeLibraries) }
 
+    dependencies.add('implementation', dependencies.enforcedPlatform(libs.compose.bom))
     dependencies.add('implementation', project(':xbox360'))
     tasks.withType(Sync).configureEach {
         if (name == 'syncModAssets') {

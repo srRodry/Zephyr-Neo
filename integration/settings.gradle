@@ -24,6 +24,11 @@ dependencyResolutionManagement {
             from(files('../engines/zephyr-mobile/gradle/libs.versions.toml'))
             version('agp', '8.13.2')
             version('kotlin', '2.2.21')
+            // The Xbox 360 frontend and APK host must call the same Compose/AndroidX APIs.
+            version('composeBom', '2025.06.00')
+            version('activityCompose', '1.10.1')
+            version('navigationCompose', '2.9.0')
+            version('lifecycleViewmodelCompose', '2.9.1')
         }
     }
 }
