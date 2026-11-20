@@ -6,10 +6,10 @@ plugins.withId('com.android.application') {
 
     androidComponents {
         finalizeDsl { dsl ->
-            dsl.defaultConfig.applicationId = 'com.pixelcode.zephyrneo'
+            dsl.defaultConfig.applicationId = providers.gradleProperty('neoPreviewApplicationId').getOrElse('com.pixelcode.zephyrneo')
             dsl.defaultConfig.minSdk = 29
-            dsl.defaultConfig.versionName = '0.1'
-            dsl.defaultConfig.versionCode = 1
+            dsl.defaultConfig.versionName = '0.1.1'
+            dsl.defaultConfig.versionCode = 2
             dsl.buildTypes.debug.minifyEnabled = false
         }
         beforeVariants(selector().withBuildType('release')) { variant ->
