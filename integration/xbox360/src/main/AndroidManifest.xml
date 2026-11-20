@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Network: core's Application/native may probe; matches legacy :app. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Legacy storage (maxSdkVersion guards: SAF is the real path on 29+). -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="29" />
+    <!-- All Files Access (API 30+) real-path mode: an ALTERNATIVE to scoped SAF for
+         devices (MIUI/HyperOS) whose OPEN_DOCUMENT_TREE picker refuses every folder.
+         When granted, the library scans + boots from a real filesystem path instead of
+         content:// SAF uris (no /proc/self/fd open). SAF stays the default mode. -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+    <!-- Controller rumble (host Activity, SP1-C; declared now so core code never NPEs). -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.gamepad" android:required="false" />
+
+    <application android:localeConfig="@xml/locales_config">
+        <meta-data android:name="android.game_mode_config" android:resource="@xml/game_mode_config" />
+        <!-- configChanges (incl. orientation|screenSize): the layout editor FORCES the screen
+             orientation via requestedOrientation so each touch layout previews as it appears
+             in-game. Without this, rotating would RECREATE MainActivity (losing the editor's
+             in-progress edits and reverting to landscape), which is why "Portrait" appeared to
+             do nothing. Compose handles the config change via recomposition. -->
+        <activity
+            android:name="xendroid.compose.MainActivity"
+            android:configChanges="layoutDirection|locale|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:exported="false"
+            android:theme="@style/Theme.xendroidCompose" />
+        <!-- SP1-C: the emulator host. Separate :emu process (libe.so is single-shot
+             per process; onDestroy -> System.exit(0) hard-kills it cleanly). singleTask
+             so a relaunch/pinned-shortcut routes to the existing task instead of
+             re-booting. Full configChanges so rotation/keyboard/etc. do NOT recreate the
+             Activity (a recreate would re-enter the single-shot boot). Fullscreen theme:
+             the Vulkan swapchain must own the whole window. -->
+        <!-- density/fontScale/colorMode/touchscreen/mcc/mnc too: changing the display size or
+             font size in system settings while a game is in the background would otherwise
+             recreate this Activity, and onDestroy ends the single-shot process (the game). -->
+        <activity
+            android:name="xendroid.compose.EmulatorHostActivity"
+            android:process=":emu"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="layoutDirection|locale|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation|density|fontScale|colorMode|touchscreen|mcc|mnc|fontWeightAdjustment|grammaticalGender"
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.xendroidEmu">
+            <!-- In-app launch: GameLibraryViewModel.buildLaunchIntent (xendroid + setPackage). -->
+            <intent-filter>
+                <action android:name="xendroid.intent.action.xendroid" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- Pinned-shortcut cold start: createShortcut sets action = ACTION_VIEW. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!-- No android:process on purpose: must land in the main process. -->
+        <service
+            android:name="xendroid.compose.core.MainAliveService"
+            android:exported="false" />
+        <!-- Status of an in-app update's install session (shows the system confirmation). -->
+        <receiver
+            android:name="xendroid.compose.updater.UpdateInstallReceiver"
+            android:exported="false" />
+        <!-- L07: user data in the system file manager. Same class name and authority as
+             before (it lived in :emulator-core), so grants already given keep working. Only
+             the system DocumentsUI (MANAGE_DOCUMENTS) calls it; apps get per-folder grants. -->
+        <provider
+            android:name="xendroid.compose.DocumentsProvider"
+            android:authorities="${applicationId}.DocumentsProvider"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/share_paths" />
+        </provider>
+    </application>
+</manifest>

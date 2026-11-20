@@ -1,0 +1,45 @@
+plugins.withId('com.android.application') {
+    def overlay = rootProject.file('host')
+    android.sourceSets.main.java.srcDir(new File(overlay, 'java'))
+    android.sourceSets.main.res.srcDir(new File(overlay, 'res'))
+    android.sourceSets.debug.manifest.srcFile(new File(overlay, 'AndroidManifest.xml'))
+
+    androidComponents {
+        finalizeDsl { dsl ->
+            dsl.defaultConfig.applicationId = 'com.pixelcode.zephyrneo'
+            dsl.defaultConfig.minSdk = 29
+            dsl.defaultConfig.versionName = '0.1'
+            dsl.defaultConfig.versionCode = 1
+            dsl.buildTypes.debug.minifyEnabled = false
+        }
+        beforeVariants(selector().withBuildType('release')) { variant ->
+            variant.enable = false
+        }
+    }
+
+    def verifyNativeLibraries = tasks.register('verifyNeoNativeLibraries') {
+        doLast {
+            def original = project.file('src/main/jniLibs/arm64-v8a')
+            def xbox360 = rootProject.layout.buildDirectory.dir('neo360-jni/arm64-v8a').get().asFile
+            def missing = [
+                (original): ['hakuxcore', 'SDL3', 'main_hook', 'file_redirect_hook',
+                             'gsl_alloc_hook', 'kgsl_context_hook', 'hook_impl'],
+                (xbox360): ['e', 'hardware_ProcessorInfo', 'neo360_main_hook',
+                            'neo360_file_redirect_hook', 'neo360_gsl_alloc_hook', 'neo360_hook_impl']
+            ].collectMany { directory, libraries ->
+                libraries.collect { new File(directory, "lib${it}.so") }.findAll { !it.isFile() }
+            }
+            if (!missing.empty) {
+                throw new GradleException("Missing Neo ARM64 libraries. Run build-android.sh first: ${missing}")
+            }
+        }
+    }
+    tasks.matching { it.name == 'preBuild' }.configureEach { dependsOn(verifyNativeLibraries) }
+
+    dependencies.add('implementation', project(':xbox360'))
+    tasks.withType(Sync).configureEach {
+        if (name == 'syncModAssets') {
+            from(rootProject.file('../engines/zephyr-x/mods')) { exclude 'README.md' }
+        }
+    }
+}

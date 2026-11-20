@@ -1,0 +1,5 @@
+<resources>
+    <string name="neo_app_name">Zephyr-Neo Preview</string>
+    <string name="neo_open_original">Xbox original</string>
+    <string name="neo_open_360">Xbox 360</string>
+</resources>

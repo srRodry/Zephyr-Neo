@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.library'
+}
+
+def mobileCore = rootProject.file('../engines/zephyr-mobile/emulator-core/src/main')
+
+android {
+    namespace 'xendroid.compose.core'
+    compileSdk 36
+
+    defaultConfig {
+        minSdk 29
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    sourceSets.main {
+        manifest.srcFile(new File(mobileCore, 'AndroidManifest.xml'))
+        java.srcDir(new File(mobileCore, 'java'))
+        res.srcDir(new File(mobileCore, 'res'))
+        assets.srcDir(new File(mobileCore, 'assets'))
+        jniLibs.srcDir(rootProject.layout.buildDirectory.dir('neo360-jni'))
+    }
+}
+
+dependencies {
+    api libs.appcompat
+    api libs.documentfile
+}

@@ -1,0 +1,45 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    plugins {
+        id 'com.android.application' version '8.13.2'
+        id 'com.android.library' version '8.13.2'
+        id 'org.jetbrains.kotlin.android' version '2.2.21'
+        id 'org.jetbrains.kotlin.plugin.compose' version '2.2.21'
+        id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.21'
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+    versionCatalogs {
+        libs {
+            from(files('../engines/zephyr-mobile/gradle/libs.versions.toml'))
+            version('agp', '8.13.2')
+            version('kotlin', '2.2.21')
+        }
+    }
+}
+
+rootProject.name = 'Zephyr-Neo'
+include ':app', ':xbox360', ':emulator-core'
+project(':app').projectDir = file('../engines/zephyr-x/android/app')
+
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.apply from: file('host.gradle')
+    } else {
+        project.pluginManager.withPlugin('com.android.library') {
+            project.extensions.getByName('androidComponents').finalizeDsl {
+                it.buildToolsVersion = '36.1.0'
+            }
+        }
+    }
+}

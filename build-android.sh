@@ -3,10 +3,15 @@ set -euo pipefail
 
 root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 engine="$root/engines/zephyr-x"
+mobile="$root/engines/zephyr-mobile"
 build="$engine/build/native/core"
 
 if [[ ! -f "$engine/native/CMakeLists.txt" ]]; then
   echo "Initialize the Zephyr-x source with git submodule update --init engines/zephyr-x." >&2
+  exit 1
+fi
+if [[ ! -f "$mobile/emulator-core/build.gradle" ]]; then
+  echo "Initialize Zephyr-Mobile with git submodule update --init engines/zephyr-mobile." >&2
   exit 1
 fi
 
@@ -22,5 +27,20 @@ cmake -S "$engine/native" -B "$build" -G Ninja \
 cmake --build "$build" --target hakuxcore
 ANDROID_NDK="$ANDROID_NDK" bash "$engine/tools/native/app-libs.sh" "$build"
 
-cd -- "$engine/android"
-./gradlew :app:assembleDebug
+mobile_build="$root/integration/build/mobile-native"
+mobile_jni="$root/integration/build/neo360-jni/arm64-v8a"
+cmake -S "$mobile/emulator-core/src/main/cpp" -B "$mobile_build" -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK/build/cmake/android.toolchain.cmake" \
+  -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-29 \
+  -DCMAKE_BUILD_TYPE=Release -DADRENOTOOLS_HOOK_PREFIX=neo360_
+cmake --build "$mobile_build" --target emu hardware_ProcessorInfo main_hook \
+  file_redirect_hook gsl_alloc_hook hook_impl
+
+mkdir -p "$mobile_jni"
+cp -- "$mobile_build/libe.so" "$mobile_build/libhardware_ProcessorInfo.so" "$mobile_jni/"
+hook_dir="$mobile_build/xenia/third_party/libadrenotools/src/hook"
+for hook in main_hook file_redirect_hook gsl_alloc_hook hook_impl; do
+  cp -- "$hook_dir/libneo360_$hook.so" "$mobile_jni/"
+done
+
+exec "$engine/android/gradlew" -p "$root/integration" :app:assembleDebug

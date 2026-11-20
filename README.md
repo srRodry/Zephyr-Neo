@@ -1,30 +1,26 @@
 # Zephyr-Neo
 
-## Base Android desta branch
+A prévia Android reúne o **Xbox original** do [Zephyr-x](https://github.com/srRodry/Zephyr-x) (hakuX/FEX) e o **Xbox 360** do [Zephyr-Mobile](https://github.com/srRodry/Zephyr-Mobile) (Xenia ARM64) em um único APK. O seletor abre a biblioteca de cada console. Cada jogo roda no processo do seu núcleo, com suas próprias bibliotecas de driver Vulkan.
 
-O [Zephyr-x](https://github.com/srRodry/Zephyr-x) é a base da interface Android e do núcleo de **Xbox original**. O submódulo fixa a revisão usada e inclui o código do hakuX, com JIT FEX, renderização Vulkan e suporte a drivers Turnip em Adreno.
+## Compilação da prévia
 
 ```sh
-git submodule update --init engines/zephyr-x
-cd engines/zephyr-x
-git submodule update --init external/fex
-git -C external/fex submodule update --init External/fmt External/range-v3 \
-  External/rpmalloc External/unordered_dense External/xxhash Source/Common/cpp-optparse
-cd ../..
+git submodule update --init engines/zephyr-x engines/zephyr-mobile
+git -C engines/zephyr-x submodule update --init external/fex
+git -C engines/zephyr-x/external/fex submodule update --init \
+  External/fmt External/range-v3 External/rpmalloc External/unordered_dense \
+  External/xxhash Source/Common/cpp-optparse
+
 ANDROID_NDK=/caminho/do/ndk NC_DEPS=/caminho/das/dependencias ./build-android.sh
 ```
 
-As revisões das dependências e o ambiente Android estão no [guia de compilação do Zephyr-x](https://github.com/srRodry/Zephyr-x/blob/a7cdb5a975e31730d488c47f6f10440b16c1e6f4/android/README.md). Use a revisão `26be815b` do libslirp. Ela define o tipo `slirp_ssize_t` exigido pelo Zephyr-x, enquanto a tag `v4.7.0` usa `ssize_t`. O script usa o app de depuração da base, com o identificador `com.rfandango.haku_x.debug`. A integração do módulo de Xbox 360 do Zephyr-Mobile fica pendente.
+Use JDK 21, plataforma Android 36, Build Tools 36.1.0, NDK 29.0.14206865, CMake 3.30.3, Ninja, Python 3, `glslangValidator`, `spirv-opt` e `spirv-dis`. Defina `ANDROID_HOME` ou configure `sdk.dir` em `integration/local.properties`. O CMake e as ferramentas de shaders precisam estar no `PATH`.
 
-## Árvore herdada do Xenra
+Para `NC_DEPS`, consulte as versões no [guia do Zephyr-x](https://github.com/srRodry/Zephyr-x/blob/a7cdb5a975e31730d488c47f6f10440b16c1e6f4/android/README.md). Use o commit `26be815b` do libslirp, que fornece `slirp_ssize_t`.
 
-Zephyr-Neo é um projeto de emulação de Xbox original para Android, derivado de Xenra/XaniteOG. A árvore atual inclui o núcleo xemu, a interface Android em Kotlin e os renderizadores Vulkan e OpenGL do chip gráfico NV2A.
+O APK de depuração fica em `engines/zephyr-x/android/app/build/outputs/apk/debug/`. O pacote é `com.pixelcode.zephyrneo.debug`, para Android ARM64 a partir da API 29. No primeiro acesso, cada biblioteca precisa da seleção de pasta de jogos no novo aplicativo.
 
-## Estado do código publicado
-
-- **Xbox original:** núcleo xemu e código dos renderizadores em [app/main/cpp/hw/xbox/nv2a/pgraph](app/main/cpp/hw/xbox/nv2a/pgraph).
-- **Xbox 360:** o núcleo Xenia Edge mencionado no histórico do Xenra não está presente neste checkout. A árvore atual só permite investigar a renderização do Xbox original.
-- **Build Android:** o [Gradle](app/build.gradle) usa os fontes em `app/main/`. A compilação nativa ainda depende da recuperação de `app/main/cpp/CMakeLists.txt` e dos arquivos de build das dependências vendorizadas. O [CMakeLists.txt na raiz](CMakeLists.txt) é um esboço sem alvos de compilação.
+A árvore histórica do Xenra fica em `app/main/`. O build desta prévia usa `integration/` e os dois submódulos.
 
 ## History & Origins
 
@@ -42,7 +38,7 @@ The upstream Xenra project described its Xbox Original and Xbox 360 backends as 
 
 ---
 
-## Android build configuration
+## Historical Xenra build configuration
 
 - The current Gradle configuration declares a minimum Android API level of 28 and the `arm64-v8a` ABI.
 - Runtime compatibility remains to be verified on a built APK.

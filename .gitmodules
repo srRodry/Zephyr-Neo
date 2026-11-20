@@ -1,3 +1,6 @@
 [submodule "engines/zephyr-x"]
 	path = engines/zephyr-x
 	url = https://github.com/srRodry/Zephyr-x.git
+[submodule "engines/zephyr-mobile"]
+	path = engines/zephyr-mobile
+	url = https://github.com/srRodry/Zephyr-Mobile.git
