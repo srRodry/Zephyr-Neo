@@ -1,22 +1,20 @@
-<p align="center">
-    <a href="https://github.com/dev-Ali2008/xenra/blob/40c583fd3254affac90ea343c567654ad79d6f90/Xbox.jpg">
-        <img height="150px" src="https://github.com/dev-Ali2008/xenra/blob/40c583fd3254affac90ea343c567654ad79d6f90/Xbox.jpg" />
-    </a>
-</p>
+# Zephyr-Neo
 
-<h1 align="center"> Xenra - emulator </h1>
+Zephyr-Neo é um projeto de emulação de Xbox original para Android, derivado de Xenra/XaniteOG. A árvore atual inclui o núcleo xemu, a interface Android em Kotlin e os renderizadores Vulkan e OpenGL do chip gráfico NV2A.
 
-Xenra is an Xbox Original and 360 emulator that runs games in XISO and ISO format only.
+## Estado do código publicado
 
----
+- **Xbox original:** núcleo xemu e código dos renderizadores em [app/main/cpp/hw/xbox/nv2a/pgraph](app/main/cpp/hw/xbox/nv2a/pgraph).
+- **Xbox 360:** o núcleo Xenia Edge mencionado no histórico do Xenra não está presente neste checkout. A árvore atual só permite investigar a renderização do Xbox original.
+- **Build Android:** o [Gradle](app/build.gradle) aponta para `app/src/main/cpp/CMakeLists.txt`. Os fontes estão em `app/main/`, e o arquivo de entrada do CMake também está ausente desse diretório. O [CMakeLists.txt na raiz](CMakeLists.txt) é um esboço sem alvos de compilação.
 
 ## History & Origins
 
-Xenra brings Original Xbox and Xbox 360 emulation together into a single cohesive application. Under the hood, it builds upon xemu for Original Xbox emulation and Xenia Edge for Xbox 360 emulation. Since its initial release, the project has been massively improved and updated.
+The upstream Xenra project described its Xbox Original and Xbox 360 backends as xemu and Xenia Edge. The sections below retain upstream context and contributor credits.
 
 ---
 
-## Features
+## Upstream features
 
 - **Hardware Detection:**  
   Automatically identifies your device's hardware (GPU, RAM) and optimizes settings for peak performance.
@@ -26,12 +24,10 @@ Xenra brings Original Xbox and Xbox 360 emulation together into a single cohesiv
 
 ---
 
-## Device Requirements
+## Android build configuration
 
-- Android 10+ or IOS 27+ (untested on lower iOS)
-- 64-bit ARM device (arm64-v8a)
-- Vulkan or Metal capable GPU/device
-- **Recommended:** 6 GB RAM or higher for better stability and performance
+- The current Gradle configuration declares a minimum Android API level of 28 and the `arm64-v8a` ABI.
+- Runtime compatibility remains to be verified on a built APK.
 
 ---
 
