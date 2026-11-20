@@ -1,5 +1,23 @@
 # Zephyr-Neo
 
+## Base Android desta branch
+
+O [Zephyr-x](https://github.com/srRodry/Zephyr-x) é a base da interface Android e do núcleo de **Xbox original**. O submódulo fixa a revisão usada e inclui o código do hakuX, com JIT FEX, renderização Vulkan e suporte a drivers Turnip em Adreno.
+
+```sh
+git submodule update --init engines/zephyr-x
+cd engines/zephyr-x
+git submodule update --init external/fex
+git -C external/fex submodule update --init External/fmt External/range-v3 \
+  External/rpmalloc External/unordered_dense External/xxhash Source/Common/cpp-optparse
+cd ../..
+ANDROID_NDK=/caminho/do/ndk NC_DEPS=/caminho/das/dependencias ./build-android.sh
+```
+
+As revisões das dependências e o ambiente Android estão no [guia de compilação do Zephyr-x](https://github.com/srRodry/Zephyr-x/blob/a7cdb5a975e31730d488c47f6f10440b16c1e6f4/android/README.md). O script usa o app de depuração da base, com o identificador `com.rfandango.haku_x.debug`. A integração do módulo de Xbox 360 do Zephyr-Mobile fica pendente.
+
+## Árvore herdada do Xenra
+
 Zephyr-Neo é um projeto de emulação de Xbox original para Android, derivado de Xenra/XaniteOG. A árvore atual inclui o núcleo xemu, a interface Android em Kotlin e os renderizadores Vulkan e OpenGL do chip gráfico NV2A.
 
 ## Estado do código publicado
